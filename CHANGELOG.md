@@ -329,3 +329,7 @@
 ## v0.24.2
 
 + Update deps & `cargo v1.19.1`.
+
+## v0.24.3
+
++ Update deps.
