@@ -333,3 +333,7 @@
 ## v0.24.3
 
 + Update deps.
+
+## v0.24.4
+
++ Update deps.
