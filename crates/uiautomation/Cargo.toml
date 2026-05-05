@@ -1,6 +1,6 @@
 [package]
 name = "uiautomation"
-version = "0.24.4"
+version = "0.25.0"
 edition = "2024"
 license = "Apache-2.0"
 authors = ["Steven Lee <leexgone@163.com>"]
@@ -34,7 +34,7 @@ log = ["dep:log"]
 
 chrono = "0.4.44"
 log = { version = "0.4.29", optional = true }
-uiautomation_derive = { version = "0.7.7", path = "../uiautomation_derive" }
+uiautomation_derive = { version = "0.7.8", path = "../uiautomation_derive" }
 
 [dependencies.windows-core]
 workspace = true
