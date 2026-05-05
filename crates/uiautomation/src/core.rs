@@ -1336,6 +1336,12 @@ impl UIElement {
         mouse.right_click(&point)
     }
 
+    /// Captures a screenshot of this element's bounding rectangle.
+    #[cfg(feature = "screenshot")]
+    pub fn screenshot(&self) -> Result<super::screenshots::Screenshot> {
+        super::screenshots::Screenshot::capture_element(self)
+    }
+
     /// Simulates dragging the element to the target element.
     #[cfg(feature = "input")]
     pub fn drag_to(&self, target: &UIElement) -> Result<()> {

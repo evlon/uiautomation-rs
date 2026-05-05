@@ -337,3 +337,7 @@
 ## v0.24.4
 
 + Update deps.
+
+## v0.25.0
+
++ Support `screenshot` feature.

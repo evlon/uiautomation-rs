@@ -21,6 +21,8 @@ pub mod controls;
 pub mod events;
 #[cfg(feature = "clipboard")]
 pub mod clipboards;
+#[cfg(feature = "screenshot")]
+pub mod screenshots;
 
 pub use self::errors::Error;
 pub use self::errors::Result;

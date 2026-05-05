@@ -20,6 +20,7 @@
 | `control` | 支持将界面元组封装为控件以简化操作 | 是 |
 | `event` | 支持侦听事件 | 否 |
 | `log` | 使用`log`包输出调试信息 | 否 |
+| `screenshot` | 支持屏幕截图（BMP/PNG格式） | 否 |
 | `all` | 启用上述所有特性 | 否 |
 
 > `control`特性依赖`pattern`特性。
@@ -163,5 +164,31 @@ fn main() {
 
     println!("waiting for notepad.exe...");
     note_proc.wait().unwrap();
+}
+```
+
+### 屏幕截图
+
+``` rust
+use uiautomation::screenshots::Screenshot;
+use uiautomation::UIAutomation;
+
+fn main() {
+    // 截取整个桌面（支持多显示器）
+    let shot = Screenshot::capture_desktop().unwrap();
+    shot.save_png("desktop.png").unwrap();
+
+    // 截取指定区域
+    use uiautomation::types::Rect;
+    let shot = Screenshot::capture_rect(Rect::new(0, 0, 800, 600)).unwrap();
+    shot.save_bmp("region.bmp").unwrap();
+
+    // 直接截取UI元素
+    let automation = UIAutomation::new().unwrap();
+    let matcher = automation.create_matcher().classname("Notepad");
+    if let Ok(notepad) = matcher.find_first() {
+        let shot = notepad.screenshot().unwrap();
+        shot.save_png("notepad.png").unwrap();
+    }
 }
 ```

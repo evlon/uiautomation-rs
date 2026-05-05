@@ -1,0 +1,9 @@
+[package]
+name = "screenshot_test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+uiautomation = { path = "../../crates/uiautomation", features = ["screenshot"] }
+windows = { workspace = true, features = ["Win32_UI_WindowsAndMessaging"] }

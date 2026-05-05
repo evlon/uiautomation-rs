@@ -20,6 +20,7 @@ Start by adding the dependency of this crate to your Cargo.toml file. Make use o
 | `control` | Enable to wrapper ui element as control to simplify operations | True |
 | `event` | Support Microsoft UI Automation events | False |
 | `log` | Use log crate to print debug message | False |
+| `screenshot` | Support screen capture with BMP/PNG output | False |
 | `all` | Enable all the above features | False |
 
 > `pattern` is a feature that `control` depends on.
@@ -163,5 +164,31 @@ fn main() {
 
     println!("waiting for notepad.exe...");
     note_proc.wait().unwrap();
+}
+```
+
+### Capture Screenshot
+
+``` rust
+use uiautomation::screenshots::Screenshot;
+use uiautomation::UIAutomation;
+
+fn main() {
+    // Capture the entire desktop (multi-monitor supported)
+    let shot = Screenshot::capture_desktop().unwrap();
+    shot.save_png("desktop.png").unwrap();
+
+    // Capture a specific region
+    use uiautomation::types::Rect;
+    let shot = Screenshot::capture_rect(Rect::new(0, 0, 800, 600)).unwrap();
+    shot.save_bmp("region.bmp").unwrap();
+
+    // Capture a UI element directly
+    let automation = UIAutomation::new().unwrap();
+    let matcher = automation.create_matcher().classname("Notepad");
+    if let Ok(notepad) = matcher.find_first() {
+        let shot = notepad.screenshot().unwrap();
+        shot.save_png("notepad.png").unwrap();
+    }
 }
 ```

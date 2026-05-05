@@ -18,7 +18,7 @@ all-features = true
 
 [features]
 default = [ "input", "control" ]
-all = [ "process", "dialog", "input", "clipboard", "pattern", "control", "event", "log" ]
+all = [ "process", "dialog", "input", "clipboard", "pattern", "control", "event", "log", "screenshot" ]
 
 process = [ "windows/Win32_System_Threading", "windows/Win32_Security", "windows/Win32_System_Diagnostics_ToolHelp" ]
 dialog = [ "windows/Win32_UI_Input_KeyboardAndMouse", "windows/Win32_UI_WindowsAndMessaging" ]
@@ -28,12 +28,15 @@ pattern = [ "uiautomation_derive/pattern_derive" ]
 control = [ "pattern", "uiautomation_derive/action_derive", "uiautomation_derive/control_derive", "windows/Win32_UI_WindowsAndMessaging" ]
 event = []
 
+screenshot = ["png", "windows/Win32_Graphics_Gdi", "windows/Win32_UI_WindowsAndMessaging"]
+
 log = ["dep:log"]
 
 [dependencies]
 
 chrono = "0.4.44"
 log = { version = "0.4.29", optional = true }
+png = { version = "0.18.1", optional = true }
 uiautomation_derive = { version = "0.7.8", path = "../uiautomation_derive" }
 
 [dependencies.windows-core]
