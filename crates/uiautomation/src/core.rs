@@ -590,6 +590,16 @@ impl UIElement {
         ControlType::try_from(control_type)
     }
 
+    /// Retrieves the raw control type ID (i32) of the element.
+    /// Useful when you need the numeric ID instead of the ControlType enum.
+    pub fn get_control_type_raw(&self) -> Result<i32> {
+        let control_type = unsafe {
+            self.element.CurrentControlType()?
+        };
+
+        Ok(control_type.0)
+    }
+
     /// Retrieves the cached control type of the element.
     pub fn get_cached_control_type(&self) -> Result<ControlType> {
         let control_type = unsafe {
@@ -1733,7 +1743,7 @@ pub struct UIMatcher {
     mode: UIMatcherMode,
     depth: u32,
     from: Option<UIElement>,
-    filters: Vec<Box<dyn MatcherFilter>>,
+    filters: Vec<Box<dyn MatcherFilter + Send + Sync>>,
     timeout: u64,
     interval: u64,
     debug: bool
@@ -1799,7 +1809,7 @@ impl UIMatcher {
     }
 
     /// Appends a filter condition which is used as `and` logic.
-     pub fn filter(mut self, filter: Box<dyn MatcherFilter>) -> Self {
+     pub fn filter(mut self, filter: Box<dyn MatcherFilter + Send + Sync>) -> Self {
         self.filters.push(filter);
         self
     }
@@ -1822,7 +1832,7 @@ impl UIMatcher {
     /// let element = matcher.find_first();
     /// assert!(element.is_ok());
     /// ```
-    pub fn filter_fn<F>(mut self, f: Box<F>) -> Self where F: Fn(&UIElement) -> Result<bool> + 'static {
+    pub fn filter_fn<F>(mut self, f: Box<F>) -> Self where F: Fn(&UIElement) -> Result<bool> + Send + Sync + 'static {
         let filter = FnFilter {
             filter: f
         };
@@ -2478,6 +2488,62 @@ impl Into<UICondition> for UIPropertyCondition {
         condition.into()
     }
 }
+
+// ============================================================================
+// Send + Sync Safety Justification for MTA COM Objects
+// ============================================================================
+//
+// All UI Automation COM interfaces wrapped by this crate are safe to send
+// and share across threads under the following conditions:
+//
+// 1. The COM library must be initialized with COINIT_MULTITHREADED (MTA mode).
+//    This crate's UIAutomation::new() calls CoInitializeEx with MTA, ensuring
+//    all threads that create UIAutomation instances are in the MTA.
+//
+// 2. All threads that access these objects must also be in the MTA.
+//    This is guaranteed by calling CoInitializeEx(None, COINIT_MULTITHREADED)
+//    before using any UIA objects on that thread.
+//
+// 3. The UI Automation COM server (uiautomationcore.dll) implements the
+//    free-threaded marshaler (FTM), making its objects inherently thread-safe
+//    without proxy/stub overhead in MTA contexts.
+//
+// 4. Reference counting (AddRef/Release) uses atomic operations, ensuring
+//    safe concurrent access to the reference count.
+//
+// WARNING: These implementations are ONLY safe in MTA contexts. Using these
+// objects from STA threads without proper marshaling would be undefined behavior.
+// ============================================================================
+
+unsafe impl Send for UIAutomation {}
+unsafe impl Sync for UIAutomation {}
+
+unsafe impl Send for UIElement {}
+unsafe impl Sync for UIElement {}
+
+unsafe impl Send for UITreeWalker {}
+unsafe impl Sync for UITreeWalker {}
+
+unsafe impl Send for UICacheRequest {}
+unsafe impl Sync for UICacheRequest {}
+
+unsafe impl Send for UICondition {}
+unsafe impl Sync for UICondition {}
+
+unsafe impl Send for UIBoolCondition {}
+unsafe impl Sync for UIBoolCondition {}
+
+unsafe impl Send for UINotCondition {}
+unsafe impl Sync for UINotCondition {}
+
+unsafe impl Send for UIAndCondition {}
+unsafe impl Sync for UIAndCondition {}
+
+unsafe impl Send for UIOrCondition {}
+unsafe impl Sync for UIOrCondition {}
+
+unsafe impl Send for UIPropertyCondition {}
+unsafe impl Sync for UIPropertyCondition {}
 
 #[cfg(test)]
 mod tests {

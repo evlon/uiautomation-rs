@@ -1698,6 +1698,18 @@ impl TryInto<Vec<bool>> for SafeArray {
     }
 }
 
+// ============================================================================
+// Send + Sync for MTA COM variant types
+// Safety: VARIANT and SAFEARRAY are safe to share across MTA threads.
+// Reference counting and data access are thread-safe in MTA contexts.
+// ============================================================================
+
+unsafe impl Send for Variant {}
+unsafe impl Sync for Variant {}
+
+unsafe impl Send for SafeArray {}
+unsafe impl Sync for SafeArray {}
+
 #[cfg(test)]
 mod tests {
     use windows::Win32::System::Variant::VT_BOOL;

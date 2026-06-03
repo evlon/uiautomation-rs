@@ -2054,6 +2054,75 @@ impl UIWindowPattern {
     }
 }
 
+// ============================================================================
+// Send + Sync for MTA COM pattern objects
+// Safety: See core.rs for justification. All UIA COM objects are free-threaded
+// under MTA initialization (COINIT_MULTITHREADED).
+// ============================================================================
+
+unsafe impl Send for UIInvokePattern {}
+unsafe impl Sync for UIInvokePattern {}
+unsafe impl Send for UIAnnotationPattern {}
+unsafe impl Sync for UIAnnotationPattern {}
+unsafe impl Send for UICustomNavigationPattern {}
+unsafe impl Sync for UICustomNavigationPattern {}
+unsafe impl Send for UIDockPattern {}
+unsafe impl Sync for UIDockPattern {}
+unsafe impl Send for UIDragPattern {}
+unsafe impl Sync for UIDragPattern {}
+unsafe impl Send for UIDropTargetPattern {}
+unsafe impl Sync for UIDropTargetPattern {}
+unsafe impl Send for UIExpandCollapsePattern {}
+unsafe impl Sync for UIExpandCollapsePattern {}
+unsafe impl Send for UIGridPattern {}
+unsafe impl Sync for UIGridPattern {}
+unsafe impl Send for UIGridItemPattern {}
+unsafe impl Sync for UIGridItemPattern {}
+unsafe impl Send for UIItemContainerPattern {}
+unsafe impl Sync for UIItemContainerPattern {}
+unsafe impl Send for UILegacyIAccessiblePattern {}
+unsafe impl Sync for UILegacyIAccessiblePattern {}
+unsafe impl Send for UIMultipleViewPattern {}
+unsafe impl Sync for UIMultipleViewPattern {}
+unsafe impl Send for UIRangeValuePattern {}
+unsafe impl Sync for UIRangeValuePattern {}
+unsafe impl Send for UIScrollPattern {}
+unsafe impl Sync for UIScrollPattern {}
+unsafe impl Send for UIScrollItemPattern {}
+unsafe impl Sync for UIScrollItemPattern {}
+unsafe impl Send for UISelectionPattern {}
+unsafe impl Sync for UISelectionPattern {}
+unsafe impl Send for UISelectionItemPattern {}
+unsafe impl Sync for UISelectionItemPattern {}
+unsafe impl Send for UISpreadsheetPattern {}
+unsafe impl Sync for UISpreadsheetPattern {}
+unsafe impl Send for UISpreadsheetItemPattern {}
+unsafe impl Sync for UISpreadsheetItemPattern {}
+unsafe impl Send for UIStylesPattern {}
+unsafe impl Sync for UIStylesPattern {}
+unsafe impl Send for UISynchronizedInputPattern {}
+unsafe impl Sync for UISynchronizedInputPattern {}
+unsafe impl Send for UITablePattern {}
+unsafe impl Sync for UITablePattern {}
+unsafe impl Send for UITableItemPattern {}
+unsafe impl Sync for UITableItemPattern {}
+unsafe impl Send for UITextChildPattern {}
+unsafe impl Sync for UITextChildPattern {}
+unsafe impl Send for UITextPattern {}
+unsafe impl Sync for UITextPattern {}
+unsafe impl Send for UITextEditPattern {}
+unsafe impl Sync for UITextEditPattern {}
+unsafe impl Send for UITogglePattern {}
+unsafe impl Sync for UITogglePattern {}
+unsafe impl Send for UITransformPattern {}
+unsafe impl Sync for UITransformPattern {}
+unsafe impl Send for UIValuePattern {}
+unsafe impl Sync for UIValuePattern {}
+unsafe impl Send for UIVirtualizedItemPattern {}
+unsafe impl Sync for UIVirtualizedItemPattern {}
+unsafe impl Send for UIWindowPattern {}
+unsafe impl Sync for UIWindowPattern {}
+
 #[cfg(test)]
 mod tests {
     use super::UIPatternType;

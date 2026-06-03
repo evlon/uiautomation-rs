@@ -449,6 +449,20 @@ impl From<Box<CustomFocusChangedEventHandlerFn>> for UIFocusChangedEventHandler 
     }
 }
 
+// ============================================================================
+// Send + Sync for MTA COM event handler types
+// Safety: See core.rs for justification.
+// ============================================================================
+
+unsafe impl Send for UIEventHandler {}
+unsafe impl Sync for UIEventHandler {}
+unsafe impl Send for UIPropertyChangedEventHandler {}
+unsafe impl Sync for UIPropertyChangedEventHandler {}
+unsafe impl Send for UIStructureChangeEventHandler {}
+unsafe impl Sync for UIStructureChangeEventHandler {}
+unsafe impl Send for UIFocusChangedEventHandler {}
+unsafe impl Sync for UIFocusChangedEventHandler {}
+
 #[cfg(test)]
 mod tests {
     use windows::Win32::UI::Accessibility::UIA_DropTarget_DroppedEventId;

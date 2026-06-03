@@ -1,5 +1,5 @@
 #[cfg(feature = "process")]
-use std::cell::RefCell;
+use std::sync::Mutex;
 use std::fmt::Debug;
 
 // use windows::Win32::Foundation::CloseHandle;
@@ -21,17 +21,17 @@ use super::core::UIElement;
 use super::errors::Result;
 
 /// `MatcherFilter` is an element filter that can be used in `UIMatcher`.
-pub trait MatcherFilter {
+pub trait MatcherFilter: Send + Sync {
     fn judge(&self, element: &UIElement) -> Result<bool>;
 }
 
 pub struct AndFilter {
-    pub left: Box<dyn MatcherFilter>,
-    pub right: Box<dyn MatcherFilter>
+    pub left: Box<dyn MatcherFilter + Send + Sync>,
+    pub right: Box<dyn MatcherFilter + Send + Sync>
 }
 
 impl AndFilter {
-    pub fn new(left: Box<dyn MatcherFilter>, right: Box<dyn MatcherFilter>) -> Self {
+    pub fn new(left: Box<dyn MatcherFilter + Send + Sync>, right: Box<dyn MatcherFilter + Send + Sync>) -> Self {
         Self {
             left,
             right
@@ -48,12 +48,12 @@ impl MatcherFilter for AndFilter {
 }
 
 pub struct OrFilter {
-    pub left: Box<dyn MatcherFilter>,
-    pub right: Box<dyn MatcherFilter>
+    pub left: Box<dyn MatcherFilter + Send + Sync>,
+    pub right: Box<dyn MatcherFilter + Send + Sync>
 }
 
 impl OrFilter {
-    pub fn new(left: Box<dyn MatcherFilter>, right: Box<dyn MatcherFilter>) -> Self {
+    pub fn new(left: Box<dyn MatcherFilter + Send + Sync>, right: Box<dyn MatcherFilter + Send + Sync>) -> Self {
         Self {
             left,
             right
@@ -127,11 +127,11 @@ impl MatcherFilter for ControlTypeFilter {
     }
 }
 
-pub struct FnFilter<F> where F: Fn(&UIElement) -> Result<bool> {
+pub struct FnFilter<F> where F: Fn(&UIElement) -> Result<bool> + Send + Sync {
     pub filter: Box<F>
 }
 
-impl<F> MatcherFilter for FnFilter<F> where F: Fn(&UIElement) -> Result<bool> {
+impl<F> MatcherFilter for FnFilter<F> where F: Fn(&UIElement) -> Result<bool> + Send + Sync {
     fn judge(&self, element: &UIElement) -> Result<bool> {
         (self.filter)(element)
     }
@@ -142,7 +142,7 @@ impl<F> MatcherFilter for FnFilter<F> where F: Fn(&UIElement) -> Result<bool> {
 pub struct ProcessIdFilter {
     pub pid: u32,
     pub sub_progress: bool,
-    progresses: RefCell<Option<Vec<u32>>>
+    progresses: Mutex<Option<Vec<u32>>>
 }
 
 #[cfg(feature = "process")]
@@ -151,7 +151,7 @@ impl Default for ProcessIdFilter {
         Self { 
             pid: Default::default(), 
             sub_progress: true, 
-            progresses: Default::default() 
+            progresses: Mutex::new(None)
         }
     }
 }
@@ -162,7 +162,7 @@ impl ProcessIdFilter {
         Self {
             pid,
             sub_progress,
-            progresses: RefCell::new(None)
+            progresses: Mutex::new(None)
         }
     }
 
@@ -171,7 +171,7 @@ impl ProcessIdFilter {
             self.build_sub_ids()?;
         }
 
-        let ids = self.progresses.borrow();
+        let ids = self.progresses.lock().unwrap();
         if let Some(ids) = ids.as_ref() {
             Ok(ids.contains(&pid))
         } else {
@@ -180,7 +180,8 @@ impl ProcessIdFilter {
     }
 
     fn is_valid(&self) -> bool {
-        if let Some(ids) = self.progresses.borrow().as_ref() {
+        let ids = self.progresses.lock().unwrap();
+        if let Some(ids) = ids.as_ref() {
             ids.get(0) == Some(&self.pid)
         } else {
             false
@@ -202,7 +203,7 @@ impl ProcessIdFilter {
             }
         }
 
-        let mut ids = self.progresses.borrow_mut();
+        let mut ids = self.progresses.lock().unwrap();
         *ids = Some(sub_ids);
 
         Ok(())
