@@ -565,6 +565,17 @@ impl UIItemContainerPattern {
 
         Ok(element.into())
     }
+
+    /// Find item by property starting from the beginning (null start_after).
+    /// Per MSDN: "If startAfter is null, the search starts from the first item."
+    /// This is useful for initial searches in virtualized containers like Chromium.
+    pub fn find_first_item_by_property(&self, property: UIProperty, value: Variant) -> Result<UIElement> {
+        let element = unsafe {
+            self.pattern.FindItemByProperty(None, property.into(), value.as_ref())?
+        };
+
+        Ok(element.into())
+    }
 }
 
 #[derive(Debug, Clone)]
